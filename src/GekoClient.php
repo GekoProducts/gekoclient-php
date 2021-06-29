@@ -3,6 +3,7 @@
 namespace GekoProducts\HttpClient;
 
 use GekoProducts\HttpClient\Repositories\OrderRepository;
+use GekoProducts\HttpClient\Repositories\Repository;
 use GekoProducts\HttpClient\Servers\ProductionServer;
 use GekoProducts\HttpClient\Servers\Server;
 
@@ -22,9 +23,12 @@ class GekoClient {
         $this->server = $server;
     }
 
+    /**
+     * @return OrderRepository
+     */
     public function order()
     {
-        return new OrderRepository($this->server);
+        return $this->repository(Repository::REPO_ORDER);
     }
 
     public static function asOrg(string $orgId, string $server = null)
@@ -41,5 +45,20 @@ class GekoClient {
         }
 
         return new self($server);
+    }
+
+    /**
+     * @param $key
+     * @return Repository|null
+     */
+    private function repository($key)
+    {
+        $repos = $this->server->getRepositories();
+
+        if (! array_key_exists($key, $repos)) {
+            return null;
+        }
+
+        return $repos[$key];
     }
 }

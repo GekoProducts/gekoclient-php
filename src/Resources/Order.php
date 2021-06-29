@@ -37,6 +37,7 @@ class Order extends Resource {
     /**
      * @param string $poDate
      * @return $this
+     * format required: Y-m-d
      */
     public function setPoDate(string $poDate)
     {

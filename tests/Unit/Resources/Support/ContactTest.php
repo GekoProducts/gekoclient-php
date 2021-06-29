@@ -57,6 +57,20 @@ class ContactTest extends TestCase {
         $this->assertSame("Smith", $attributes["last_name"]);
     }
 
+    public function testItCanSetCompanyName()
+    {
+        $contact = $this->contact();
+
+        // optional field
+        $this->assertArrayNotHasKey("company_name", $contact->toArray());
+        $contact->setCompanyName("ACME Ltd");
+
+        $attributes = $contact->toArray();
+
+        $this->assertArrayHasKey("company_name", $attributes);
+        $this->assertSame("ACME Ltd", $attributes["company_name"]);
+    }
+
     public function testItCanSetAddressLine1()
     {
         $contact = $this->contact();

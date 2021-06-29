@@ -169,19 +169,19 @@ class Contact {
         ];
 
         // These fields are optional, and not included unless set
-        if (! is_null($this->companyName)) {
+        if (! is_null($this->companyName) && strlen(trim($this->companyName)) > 0) {
             $attributes["company_name"] = $this->companyName;
         }
 
-        if (! is_null($this->addressLine2)) {
+        if (! is_null($this->addressLine2) && strlen(trim($this->addressLine2)) > 0) {
             $attributes["address_line_2"] = $this->addressLine2;
         }
 
-        if (! is_null($this->email)) {
+        if (! is_null($this->email) && strlen(trim($this->email)) > 0) {
             $attributes["email"] = $this->email;
         }
 
-        if (! is_null($this->phone)) {
+        if (! is_null($this->phone) && strlen(trim($this->phone)) > 0) {
             $attributes["phone"] = $this->phone;
         }
 

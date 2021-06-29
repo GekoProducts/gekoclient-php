@@ -17,7 +17,7 @@ class ServerTest extends TestCase {
     {
         $server = $this->server();
 
-        $uri = $server->getUri(UriVerb::ORDER_CREATE);
+        $uri = $server->getUri(UriVerb::ORDERS_CREATE);
 
         $this->assertIsString($uri);
         $this->assertSame("/api/v1/order", $uri);

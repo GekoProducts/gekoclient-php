@@ -8,6 +8,8 @@ use GuzzleHttp\Psr7\Request;
 
 abstract class Repository {
 
+    const REPO_ORDER = "order";
+
     /**
      * @var Server
      */
@@ -22,7 +24,7 @@ abstract class Repository {
         $this->server = $server;
     }
 
-    protected function getServer()
+    public function getServer()
     {
         return $this->server;
     }

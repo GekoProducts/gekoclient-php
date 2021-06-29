@@ -2,6 +2,9 @@
 
 namespace GekoProducts\HttpClient\Servers;
 
+use GekoProducts\HttpClient\Exceptions\ServerResponseException;
+use GekoProducts\HttpClient\Repositories\OrderRepository;
+use GekoProducts\HttpClient\Repositories\Repository;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 
@@ -52,6 +55,19 @@ abstract class Server {
         return $uris[$key];
     }
 
+    public function get(string $uri, array $headers = [])
+    {
+        $request = new Request("GET", $uri, $headers);
+
+        $response = $this->httpClient->send($request);
+
+        if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
+            return (string) $response->getBody();
+        }
+
+        throw new ServerResponseException($response);
+    }
+
     public function post(string $uri, array $data, array $headers = [])
     {
         $data = json_encode($data);
@@ -59,9 +75,18 @@ abstract class Server {
 
         $response = $this->httpClient->send($request);
 
-        if ($response->getStatusCode() == 201) {
+        if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
             return (string) $response->getBody();
         }
+
+        throw new ServerResponseException($response);
+    }
+
+    public function getRepositories()
+    {
+        return [
+            Repository::REPO_ORDER => new OrderRepository($this)
+        ];
     }
 
     protected function setupHttpClient()
@@ -70,7 +95,8 @@ abstract class Server {
             "base_uri" => $this->address,
             "headers" => [
                 "X-Geko-Org-Id" => $this->orgId,
-                "Content-Type" => "application/json"
+                "Content-Type" => "application/json",
+                "Accept" => "application/json",
             ]
         ]);
     }
@@ -78,7 +104,8 @@ abstract class Server {
     protected function getUris()
     {
         return [
-            UriVerb::ORDER_CREATE => "/api/{$this->apiVersion}/order",
+            UriVerb::ORDERS_CREATE => "/api/{$this->apiVersion}/orders",
+            UriVerb::ORDERS_GET => "/api/{$this->apiVersion}/orders",
         ];
     }
 }
