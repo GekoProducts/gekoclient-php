@@ -5,7 +5,7 @@ namespace GekoProducts\HttpClient\Tests\Feature\Order;
 use GekoProducts\HttpClient\GekoClient;
 use GekoProducts\HttpClient\Resources\Support\Contact;
 use GekoProducts\HttpClient\Resources\Support\OrderLine;
-use GekoProducts\HttpClient\Tests\Support\TestingServer;
+use GekoProducts\HttpClient\Tests\Support\TestingResourceServer;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 
@@ -14,7 +14,7 @@ class CreateOrderTest extends TestCase {
     public function testItCanSuccessfullyPlaceAnOrder()
     {
         $client = new GekoClient(
-            TestingServer::fake([
+            TestingResourceServer::fake([
                 new Response(201, [], file_get_contents(__DIR__ . "/../../stubs/successful_order.json"))
             ])
         );

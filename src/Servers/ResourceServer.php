@@ -2,13 +2,18 @@
 
 namespace GekoProducts\HttpClient\Servers;
 
+use GekoProducts\HttpClient\Contracts\AuthorisationServer;
 use GekoProducts\HttpClient\Exceptions\ServerResponseException;
 use GekoProducts\HttpClient\Repositories\OrderRepository;
 use GekoProducts\HttpClient\Repositories\Repository;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 
-abstract class Server {
+abstract class ResourceServer {
+
+    const HTTP_METHOD_POST = "POST";
+
+    const HTTP_METHOD_GET = "GET";
 
     /**
      * @var string $orgId
@@ -31,15 +36,18 @@ abstract class Server {
     protected $apiVersion = "v1";
 
     /**
+     * @var AuthorisationServer $authServer
+     */
+    private $authServer;
+
+    /**
      * Server constructor.
      * @param string $orgId
      * @param string $address
      */
-    public function __construct(string $orgId, string $address)
+    public function __construct(string $orgId)
     {
         $this->orgId = $orgId;
-
-        $this->address = $address;
 
         $this->setupHttpClient();
     }
@@ -57,29 +65,12 @@ abstract class Server {
 
     public function get(string $uri, array $headers = [])
     {
-        $request = new Request("GET", $uri, $headers);
-
-        $response = $this->httpClient->send($request);
-
-        if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
-            return (string) $response->getBody();
-        }
-
-        throw new ServerResponseException($response);
+        return $this->request(self::HTTP_METHOD_GET, $uri, $headers);
     }
 
     public function post(string $uri, array $data, array $headers = [])
     {
-        $data = json_encode($data);
-        $request = new Request("POST", $uri, $headers, $data);
-
-        $response = $this->httpClient->send($request);
-
-        if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
-            return (string) $response->getBody();
-        }
-
-        throw new ServerResponseException($response);
+        return $this->request(self::HTTP_METHOD_POST, $uri, $headers, $data);
     }
 
     public function getRepositories()
@@ -87,6 +78,45 @@ abstract class Server {
         return [
             Repository::REPO_ORDER => new OrderRepository($this)
         ];
+    }
+
+    /**
+     * @param AuthorisationServer $authServer
+     */
+    public function setAuthServer(AuthorisationServer $authServer = null): void
+    {
+        $this->authServer = $authServer;
+    }
+
+    protected function request(string $method, string $uri, array $headers, array $data = [])
+    {
+        switch ($method) {
+            case self::HTTP_METHOD_POST:
+                $data = json_encode($data);
+                $request = new Request(self::HTTP_METHOD_POST, $uri, $headers, $data);
+                break;
+            default:
+                $request = new Request(self::HTTP_METHOD_GET, $uri, $headers);
+        }
+
+        $request = $this->authoriseRequest($request);
+
+        $response = $this->httpClient->send($request);
+
+        if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
+            return (string) $response->getBody();
+        }
+
+        throw new ServerResponseException($response);
+    }
+
+    protected function authoriseRequest(Request $request) : ?Request
+    {
+        if (is_null($this->authServer)) {
+            return $request;
+        }
+
+        return $this->authServer->authoriseRequest($request);
     }
 
     protected function setupHttpClient()

@@ -2,7 +2,7 @@
 
 namespace GekoProducts\HttpClient\Repositories;
 
-use GekoProducts\HttpClient\Servers\Server;
+use GekoProducts\HttpClient\Servers\ResourceServer;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 
@@ -11,15 +11,15 @@ abstract class Repository {
     const REPO_ORDER = "order";
 
     /**
-     * @var Server
+     * @var ResourceServer
      */
     private $server;
 
     /**
      * Repository constructor.
-     * @param Server $server
+     * @param ResourceServer $server
      */
-    public function __construct(Server $server)
+    public function __construct(ResourceServer $server)
     {
         $this->server = $server;
     }
