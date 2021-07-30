@@ -32,6 +32,11 @@ class GekoClient {
         return $this->repository(Repository::REPO_ORDER);
     }
 
+    public function product()
+    {
+        return $this->repository(Repository::REPO_PRODUCT);
+    }
+
     public static function asOrg($org, AuthorisationServer $authServer = null)
     {
         if ($org instanceof ResourceServer) {

@@ -5,23 +5,14 @@ namespace GekoProducts\HttpClient\Resources;
 use GekoProducts\HttpClient\Resources\Support\Contact;
 use GekoProducts\HttpClient\Resources\Support\OrderLine;
 
-class Order extends Resource {
-
+class Order extends Resource
+{
     protected $requiredAttributes = [
         "contacts",
         "contacts.billing",
         "contacts.shipping",
         "lines",
     ];
-
-    /**
-     * Order constructor.
-     * @param array $attributes
-     */
-    public function __construct(array $attributes = [])
-    {
-        $this->attributes = $attributes;
-    }
 
     /**
      * @param string $poNumber
@@ -63,9 +54,12 @@ class Order extends Resource {
      */
     public function setOrderLines(array $orderLines)
     {
-        $this->attributes["lines"] = array_map(function (OrderLine $orderLine) {
-            return $orderLine->toArray();
-        }, $orderLines);
+        $this->attributes["lines"] = array_map(
+            function (OrderLine $orderLine) {
+                return $orderLine->toArray();
+            },
+            $orderLines
+        );
 
         return $this;
     }
@@ -90,22 +84,5 @@ class Order extends Resource {
         $this->attributes["contacts"]["shipping"] = $contact->toArray();
 
         return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getAttributes()
-    {
-        return $this->attributes;
-    }
-
-    public function getAttribute(string $key, $default = null)
-    {
-        if (! array_key_exists($key, $this->attributes)) {
-            return $default;
-        }
-
-        return $this->attributes[$key];
     }
 }
