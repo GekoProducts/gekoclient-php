@@ -2,23 +2,24 @@
 
 namespace GekoProducts\HttpClient;
 
+use GekoProducts\HttpClient\Contracts\AuthorisationServer;
 use GekoProducts\HttpClient\Repositories\OrderRepository;
 use GekoProducts\HttpClient\Repositories\Repository;
-use GekoProducts\HttpClient\Servers\ProductionServer;
-use GekoProducts\HttpClient\Servers\Server;
+use GekoProducts\HttpClient\Servers\ProductionResourceServer;
+use GekoProducts\HttpClient\Servers\ResourceServer;
 
 class GekoClient {
 
     /**
-     * @var Server $server
+     * @var ResourceServer $server
      */
     private $server;
 
     /**
      * GekoClient constructor.
-     * @param Server $server
+     * @param ResourceServer $server
      */
-    public function __construct(Server $server)
+    public function __construct(ResourceServer $server)
     {
         $this->server = $server;
     }
@@ -31,18 +32,20 @@ class GekoClient {
         return $this->repository(Repository::REPO_ORDER);
     }
 
-    public static function asOrg(string $orgId, string $server = null)
+    public function product()
     {
-        if (is_null($server)) {
-            $server = new ProductionServer($orgId);
+        return $this->repository(Repository::REPO_PRODUCT);
+    }
+
+    public static function asOrg($org, AuthorisationServer $authServer = null)
+    {
+        if ($org instanceof ResourceServer) {
+            $server = $org;
+        } else {
+            $server = new ProductionResourceServer($org);
         }
 
-        $reflectionClass = new \ReflectionClass($server);
-        $server = $reflectionClass->newInstance($orgId);
-
-        if (! $server instanceof Server) {
-            throw new \Exception("The server must be an instance of \GekoProducts\HttpClient\Servers\Server");
-        }
+        $server->setAuthServer($authServer);
 
         return new self($server);
     }

@@ -8,15 +8,6 @@ use GekoProducts\HttpClient\Servers\UriVerb;
 
 class OrderRepository extends Repository {
 
-    public function makeCollection($orders = [])
-    {
-        $collection = array_map(function ($attributes) {
-            return $this->make($attributes);
-        }, $orders);
-
-        return $collection;
-    }
-
     public function make($attributes = [])
     {
         return new Order($attributes);
@@ -27,7 +18,7 @@ class OrderRepository extends Repository {
         $server = $this->getServer();
 
         $ordersBody = $server->get(
-            $server->getUri(UriVerb::ORDERS_GET),
+            $server->getUri(UriVerb::ORDERS_GET)
         );
 
         $ordersData = json_decode($ordersBody, true);

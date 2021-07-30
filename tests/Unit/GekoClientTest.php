@@ -4,14 +4,14 @@ namespace GekoProducts\HttpClient\Tests\Unit;
 
 use GekoProducts\HttpClient\GekoClient;
 use GekoProducts\HttpClient\Repositories\OrderRepository;
-use GekoProducts\HttpClient\Tests\Support\TestingServer;
+use GekoProducts\HttpClient\Tests\Support\TestingResourceServer;
 use PHPUnit\Framework\TestCase;
 
 class GekoClientTest extends TestCase {
 
     public function testOrderReturnsOrderRepository()
     {
-        $client = new GekoClient(TestingServer::fake());
+        $client = new GekoClient(TestingResourceServer::fake());
 
         $orderRepo = $client->order();
 
@@ -20,7 +20,7 @@ class GekoClientTest extends TestCase {
 
     public function testInitAsOrg()
     {
-        $client = GekoClient::asOrg(TestingServer::ORG_ID, TestingServer::class);
+        $client = GekoClient::asOrg(TestingResourceServer::ORG_ID);
 
         $this->assertInstanceOf(GekoClient::class, $client);
     }
